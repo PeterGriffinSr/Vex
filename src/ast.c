@@ -7,44 +7,48 @@
 #include <stdlib.h>
 #include "include/ast.h"
 
-ASTNode *create_int_node(int value) {
+static ASTNode *alloc_node(NodeType type) {
     ASTNode *node = malloc(sizeof(ASTNode));
-    node->type = NodeIntLit;
+    if (!node) {
+        fprintf(stderr, "Out of memory!\n");
+        exit(EXIT_FAILURE);
+    }
+    node->type = type;
+    return node;
+}
+
+ASTNode *create_int_node(int value) {
+    ASTNode *node = alloc_node(NodeIntLit);
     node->intval = value;
     return node;   
 }
 
 ASTNode *create_float_node(double value) {
-    ASTNode *node = malloc(sizeof(ASTNode));
-    node->type = NodeFloatLit;
+    ASTNode *node = alloc_node(NodeFloatLit);
     node->floatval = value;
     return node;
 }
 
 ASTNode *create_char_node(char value) {
-    ASTNode *node = malloc(sizeof(ASTNode));
-    node->type = NodeCharLit;
+    ASTNode *node = alloc_node(NodeCharLit);
     node->charval = value;
     return node;
 }
 
 ASTNode *create_string_node(char *value) {
-    ASTNode *node = malloc(sizeof(ASTNode));
-    node->type = NodeStringLit;
+    ASTNode *node = alloc_node(NodeStringLit);
     node->strval = strdup(value);
     return node;
 }
 
 ASTNode *create_identifier_node(char *value) {
-    ASTNode *node = malloc(sizeof(ASTNode));
-    node->type = NodeIdentifier;
+    ASTNode *node = alloc_node(NodeIdentifier);
     node->strval = strdup(value);
     return node;
 }
 
 ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right) {
-    ASTNode *node = malloc(sizeof(ASTNode));
-    node->type = NodeBinaryExpr;
+    ASTNode *node = alloc_node(NodeBinaryExpr);
     node->binary_expr.op = op;
     node->binary_expr.left = left;
     node->binary_expr.right = right;
@@ -78,7 +82,7 @@ void printAST(ASTNode *node, int indent) {
             printf("BinaryOp: '%s'\n", node->binary_expr.op);
             printAST(node->binary_expr.left, indent + 1);
             printAST(node->binary_expr.right, indent + 1);
-            break;       
+            break;
         default:
             return;
     }
@@ -88,13 +92,7 @@ void freeAST(ASTNode *node) {
     if (!node) return;
 
     switch (node->type) {
-        case NodeIntLit:
-        case NodeFloatLit:
-        case NodeCharLit:
-            break;
         case NodeStringLit:
-            free(node->strval);
-            break;
         case NodeIdentifier:
             free(node->strval);
             break;

@@ -30,7 +30,7 @@ bison = find_program('bison', required: true)
 parser_c = custom_target('parser.c',
   input: 'src/parser.y',
   output: ['parser.c', 'parser.h'],
-  command: [bison, '-d', '-Wcounterexamples', '-o', '@OUTPUT0@', '@INPUT@'],
+  command: [bison, '-d', '-o', '@OUTPUT0@', '@INPUT@'],
   depend_files: ['src/parser.y']
 )
 
@@ -43,7 +43,7 @@ lexer_c = custom_target('lexer.c',
 
 srcs = [
   'src/ast.c',
-  'src/vex.c',
+  'src/main.c',
   parser_c,
   lexer_c
 ]

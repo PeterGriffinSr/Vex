@@ -55,6 +55,11 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "rec"           { yycolumn += yyleng; return Rec; }
 "None"          { yycolumn += yyleng; return None; }
 "Some"          { yycolumn += yyleng; return Some; }
+"int"           { yycolumn += yyleng; return Int; }
+"char"          { yycolumn += yyleng; return Char; }
+"bool"          { yycolumn += yyleng; return Bool; }
+"float"         { yycolumn += yyleng; return Float; }
+"string"        { yycolumn += yyleng; return String; }
 
 "print"         { yycolumn += yyleng; return Print; }
 "map"           { yycolumn += yyleng; return Map; }

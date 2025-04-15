@@ -21,7 +21,6 @@ void yyerror(const char *s) {
     char charval;
     int boolval;
     struct ASTNode* node;
-    struct ASTNodeList* list;
 }
 
 %token <intval> IntLit
@@ -39,6 +38,7 @@ void yyerror(const char *s) {
 %token LParen RParen LBracket RBracket LBrace RBrace Plus Minus Star Slash Assignment Comma Dot Underscore Pipe Less Greater Semi
 %token Equal NotEqual LessEqual GreaterEqual ThiccArrow SkinnyArrow Spread
 %token Let Type Match With If Else Rec None Some NewLine
+%token Int Float Char String Bool
 %token Print Map Filter
 
 %type <node> expr

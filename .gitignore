@@ -12,7 +12,6 @@ Thumbs.db
 !*.c
 !*.h
 !*.md
-!*.vex
 !.y
 !.l
 !*/
