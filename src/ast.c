@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include "include/ast.h"
 
-static ASTNode *alloc_node(NodeType type) {
+ASTNode *alloc_node(NodeType type) {
     ASTNode *node = malloc(sizeof(ASTNode));
     if (!node) {
         fprintf(stderr, "Out of memory!\n");

@@ -52,9 +52,12 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "with"          { yycolumn += yyleng; return With; }
 "if"            { yycolumn += yyleng; return If; }
 "else"          { yycolumn += yyleng; return Else; }
+"then"          { yycolumn += yyleng; return Then; }
 "rec"           { yycolumn += yyleng; return Rec; }
 "None"          { yycolumn += yyleng; return None; }
 "Some"          { yycolumn += yyleng; return Some; }
+"Ok"            { yycolumn += yyleng; return Ok; }
+"Error"         { yycolumn += yyleng; return Error; }
 "int"           { yycolumn += yyleng; return Int; }
 "char"          { yycolumn += yyleng; return Char; }
 "bool"          { yycolumn += yyleng; return Bool; }
