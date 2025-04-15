@@ -1,0 +1,24 @@
+# === System-generated files ===
+Thumbs.db
+.DS_Store
+
+# === Editor & IDE files ===
+*~
+*#
+*.swp
+#*#
+
+# === Build artifacts ===
+!*.c
+!*.h
+!*.md
+!*.vex
+!.y
+!.l
+!*/
+
+# === Build system caches ===
+.cache/
+.deps/
+.vscode/
+build/
