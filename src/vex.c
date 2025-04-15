@@ -16,14 +16,14 @@ extern void yylex_destroy(void);
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        fputs("nim: error: no input file\n", stderr);
+        fputs("vex: error: no input file\n", stderr);
         return EXIT_FAILURE;
     }
 
     filename = argv[1];
     FILE *file = fopen(filename, "r");
     if (!file) {
-        fprintf(stderr, "nim: error: could not read file '%s'\n", filename);
+        fprintf(stderr, "vex: error: could not read file '%s'\n", filename);
         return EXIT_FAILURE;
     }
 

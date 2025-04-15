@@ -1,3 +1,7 @@
+#if defined (__linux__) || defined (__unix__) || defined (__APPLE__)
+#define _POSIX_C_SOURCE 200809L
+#endif
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>

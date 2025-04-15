@@ -3,6 +3,7 @@ project('vex', 'c',
     default_options: [
         'buildtype=debug',
         'warning_level=3',
+        'c_std=c17',
     ],
     license: 'MIT'
 )
@@ -42,7 +43,7 @@ lexer_c = custom_target('lexer.c',
 
 srcs = [
   'src/ast.c',
-  'src/nim.c',
+  'src/vex.c',
   parser_c,
   lexer_c
 ]

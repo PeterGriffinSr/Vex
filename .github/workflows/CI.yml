@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up dependencies (Linux/macOS)
+      if: runner.os == 'Linux' || runner.os == 'macOS'
+      run: |
+        if [ $RUNNER_OS == 'Linux' ]; then
+          sudo apt-get update
+          sudo apt-get install -y flex bison gcc meson
+        elif [ $RUNNER_OS == 'macOS' ]; then
+          brew update
+          brew install gcc flex bison meson
+        fi
+
+    - name: Install scoop (Windows)
+      if: runner.os == 'Windows'
+      uses: MinoruSekine/setup-scoop@v4.0.1
+      with:
+        install_scoop: 'true'
+        buckets: extras
+        apps: ${{ env.packages_to_install }}
+        scoop_update: 'true'
+        update_path: 'true'
+
+    - name: Setup scoop PATH (Windows)
+      if: runner.os == 'Windows'
+      uses: MinoruSekine/setup-scoop@v4.0.1
+      with:
+        install_scoop: 'false'
+        scoop_update: 'false'
+        update_path: 'true'
+
+    - name: Set up dependencies (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        scoop install winflexbison meson gcc
+
+    - name: Bootstrap the build system
+      run: |
+        meson setup build
+
+    - name: Build the project
+      run: |
+        meson compile -C build
