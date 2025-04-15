@@ -21,3 +21,5 @@ Thumbs.db
 .deps/
 .vscode/
 build/
+cross-build/
+packages/

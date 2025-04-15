@@ -15,4 +15,4 @@ To start using Vex, follow these simple steps:
     let main() =
         print("Hello, world");
     ```
-3. **Explore the Documentation**: Check out the [Vex documentation](#) for detailed guides, tutorials, and API references.
+3. **Explore the Documentation**: Check out the [Vex documentation](/docs/vex/getting-started.md) for detailed guides, tutorials, and API references.

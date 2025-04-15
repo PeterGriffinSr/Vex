@@ -7,14 +7,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include "include/ast.h"
+#include "include/memory.h"
 #include "parser.h"
 
+Arena *global_arena = NULL;
 extern FILE *yyin;
 extern ASTNode *root;
 extern const char *filename;
 extern void yylex_destroy(void);
 
 int main(int argc, char *argv[]) {
+    global_arena = arena_create(1024 * 1024);
+
     if (argc < 2) {
         fputs("vex: error: no input file\n", stderr);
         return EXIT_FAILURE;
@@ -36,7 +40,7 @@ int main(int argc, char *argv[]) {
     }
 
     fclose(file);
-    freeAST(root);
+    arena_destroy(global_arena);
     yylex_destroy();
 
     return EXIT_SUCCESS;

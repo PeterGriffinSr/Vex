@@ -20,7 +20,7 @@ struct ASTNode {
         int intval;
         double floatval;
         char charval;
-        char *strval;
+        const char *strval;
 
         struct {
             const char *op;
@@ -33,11 +33,10 @@ ASTNode *alloc_node(NodeType type);
 ASTNode *create_int_node(int value);
 ASTNode *create_char_node(char value);
 ASTNode *create_float_node(double value);
-ASTNode *create_string_node(char *value);
-ASTNode *create_identifier_node(char *value);
+ASTNode *create_string_node(const char *value);
+ASTNode *create_identifier_node(const char *value);
 ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right);
 
 void printAST(ASTNode *node, int indent);
-void freeAST(ASTNode *node);
 
 #endif // AST_H

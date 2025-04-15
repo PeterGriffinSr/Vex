@@ -1,18 +1,13 @@
-#if defined (__linux__) || defined (__unix__) || defined (__APPLE__)
-#define _POSIX_C_SOURCE 200809L
-#endif
-
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 #include "include/ast.h"
+#include "include/memory.h"
+
+extern Arena *global_arena;
 
 ASTNode *alloc_node(NodeType type) {
-    ASTNode *node = malloc(sizeof(ASTNode));
-    if (!node) {
-        fprintf(stderr, "Out of memory!\n");
-        exit(EXIT_FAILURE);
-    }
+    ASTNode *node = arena_alloc(global_arena, sizeof(ASTNode));
     node->type = type;
     return node;
 }
@@ -35,15 +30,21 @@ ASTNode *create_char_node(char value) {
     return node;
 }
 
-ASTNode *create_string_node(char *value) {
+ASTNode *create_string_node(const char *value) {
     ASTNode *node = alloc_node(NodeStringLit);
-    node->strval = strdup(value);
+    size_t len = strlen(value) + 1;
+    char *copy = arena_alloc(global_arena, len);
+    memcpy(copy, value, len);
+    node->strval = copy;
     return node;
 }
 
-ASTNode *create_identifier_node(char *value) {
+ASTNode *create_identifier_node(const char *value) {
     ASTNode *node = alloc_node(NodeIdentifier);
-    node->strval = strdup(value);
+    size_t len = strlen(value) + 1;
+    char *copy = arena_alloc(global_arena, len);
+    memcpy(copy, value, len);
+    node->strval = copy;
     return node;
 }
 
@@ -86,23 +87,4 @@ void printAST(ASTNode *node, int indent) {
         default:
             return;
     }
-}
-
-void freeAST(ASTNode *node) {
-    if (!node) return;
-
-    switch (node->type) {
-        case NodeStringLit:
-        case NodeIdentifier:
-            free(node->strval);
-            break;
-        case NodeBinaryExpr:
-            freeAST(node->binary_expr.left);
-            freeAST(node->binary_expr.right);
-            break;
-        default:
-            break;
-    }
-
-    free(node);
 }

@@ -1,5 +1,6 @@
 %{
 #include "parser.h"
+#include "error.h"
 int yycolumn = 1;
 const char *filename;
 %}
@@ -35,7 +36,6 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "|"             { yycolumn += yyleng; return Pipe; }
 "<"             { yycolumn += yyleng; return Less; }
 ">"             { yycolumn += yyleng; return Greater; }
-";"             { yycolumn += yyleng; return Semi; }
 
 "=="            { yycolumn += yyleng; return Equal; }
 "!="            { yycolumn += yyleng; return NotEqual; }
@@ -76,6 +76,7 @@ StringLiteral   \"(\\.|[^\\"])*\"
 
 [ \t\r]+        { yycolumn += yyleng; }
 \n              { yycolumn = 1; yylineno++; return NewLine; }
+.               { report_error("Unknown Character"); }
 
 %%
 

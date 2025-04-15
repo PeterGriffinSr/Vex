@@ -44,6 +44,8 @@ lexer_c = custom_target('lexer.c',
 srcs = [
   'src/ast.c',
   'src/main.c',
+  'src/memory.c',
+  'src/error.c',
   parser_c,
   lexer_c
 ]
