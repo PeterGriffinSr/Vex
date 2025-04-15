@@ -4,15 +4,15 @@ mkdir -p cross-build
 mkdir -p packages
 
 targets=(
-    "aarch64-linux-gnu"  
-    "i686-linux-gnu"    
-    "mips64-linux-gnu"  
-    "powerpc64-linux-gnu"  
-    "x86_64-w64-mingw32"
-    "arm-linux-gnu"      
-    "i686-w64-mingw32"  
-    "mips-linux-gnu" 
+    "aarch64-linux-gnu"
+    "i686-linux-gnu"
     "x86_64-linux-gnu"
+    "mips-linux-gnu"
+    "mips64-linux-gnu"
+    "powerpc64-linux-gnu"
+    "arm-linux-gnu"
+    "i686-w64-mingw32"
+    "x86_64-w64-mingw32"
 )
 
 cross_dir="crossfiles"

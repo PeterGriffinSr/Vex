@@ -21,6 +21,7 @@ add_project_arguments(
   '-pedantic',
   '-Wvla',
   '-Wstrict-prototypes',
+  '-D_XOPEN_SOURCE=700',
   language: 'c'
 )
 

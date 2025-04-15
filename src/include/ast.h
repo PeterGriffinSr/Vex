@@ -2,12 +2,14 @@
 #define AST_H
 
 #include <stddef.h>
+
 typedef enum {
     NodeIntLit,
     NodeFloatLit,
     NodeStringLit,
     NodeCharLit,
     NodeIdentifier,
+    NodeVarDecl,
     NodeBinaryExpr
 } NodeType;
 
@@ -26,6 +28,11 @@ struct ASTNode {
             const char *op;
             ASTNode *left, *right;
         } binary_expr;
+
+        struct {
+            const char *value, *type;
+            ASTNode *expr;
+        } var_decl;
     };
 };
 
@@ -36,6 +43,7 @@ ASTNode *create_float_node(double value);
 ASTNode *create_string_node(const char *value);
 ASTNode *create_identifier_node(const char *value);
 ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right);
+ASTNode *create_var_decl_node(const char* value, const char *type, ASTNode *expr);
 
 void printAST(ASTNode *node, int indent);
 

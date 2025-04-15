@@ -48,6 +48,14 @@ ASTNode *create_identifier_node(const char *value) {
     return node;
 }
 
+ASTNode *create_var_decl_node(const char *value, const char *type, ASTNode *expr) {
+    ASTNode *node = alloc_node(NodeVarDecl);
+    node->var_decl.value = value;
+    node->var_decl.type = type;
+    node->var_decl.expr = expr;
+    return node;
+}
+
 ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right) {
     ASTNode *node = alloc_node(NodeBinaryExpr);
     node->binary_expr.op = op;
@@ -83,6 +91,15 @@ void printAST(ASTNode *node, int indent) {
             printf("BinaryOp: '%s'\n", node->binary_expr.op);
             printAST(node->binary_expr.left, indent + 1);
             printAST(node->binary_expr.right, indent + 1);
+            break;
+        case NodeVarDecl:
+            printf("VarDecl: ");
+            printf("Type: %s, ", node->var_decl.type ? node->var_decl.type : "<inferred>");
+            printf("Identifier: %s", node->var_decl.value);
+            if (node->var_decl.expr) {
+                printf(" =\n");
+                printAST(node->var_decl.expr, indent + 1);
+            }
             break;
         default:
             return;

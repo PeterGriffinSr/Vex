@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 #include "include/error.h"
 #include "include/color.h"

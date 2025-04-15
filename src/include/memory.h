@@ -2,6 +2,7 @@
 #define MEMORY_H
 
 #include <stddef.h>
+
 typedef struct Arena {
     char *memory;
     size_t capacity, used;

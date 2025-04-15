@@ -1,8 +1,10 @@
 %{
 #include "parser.h"
+#include "memory.h"
 #include "error.h"
 int yycolumn = 1;
 const char *filename;
+extern Arena *global_arena;
 %}
 
 %option noinput nounput
@@ -36,6 +38,8 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "|"             { yycolumn += yyleng; return Pipe; }
 "<"             { yycolumn += yyleng; return Less; }
 ">"             { yycolumn += yyleng; return Greater; }
+":"             { yycolumn += yyleng; return Colon; }
+";"             { yycolumn += yyleng; return Semi; }
 
 "=="            { yycolumn += yyleng; return Equal; }
 "!="            { yycolumn += yyleng; return NotEqual; }
@@ -69,13 +73,15 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "filter"        { yycolumn += yyleng; return Filter; }
 
 {CharLiteral}   { yycolumn += yyleng; yylval.charval = yytext[1]; return CharLit; }
-{StringLiteral} { yycolumn += yyleng; yylval.strval = yytext; return StringLit; }
+{StringLiteral} { yycolumn += yyleng; char *copy = arena_alloc(global_arena, (size_t)yyleng + 1); memcpy(copy, yytext, (size_t)yyleng + 1); yylval.strval = copy; return StringLit; }
 {IntLiteral}    { yycolumn += yyleng; yylval.intval = atoi(yytext); return IntLit; }
 {FloatLiteral}  { yycolumn += yyleng; yylval.floatval = strtof(yytext, NULL); return FloatLit; }
-{Identifier}    { yycolumn += yyleng; yylval.strval = yytext; return Ident; }
+{Identifier}    { yycolumn += yyleng; char *copy = arena_alloc(global_arena, (size_t)yyleng + 1); memcpy(copy, yytext, (size_t)yyleng + 1); yylval.strval = copy; return Ident; }
 
 [ \t\r]+        { yycolumn += yyleng; }
-\n              { yycolumn = 1; yylineno++; return NewLine; }
+\n              { yycolumn = 1; yylineno++; }
+\'[^']*$        { report_error("Unterminated char literal"); }
+\"[^\"\n]*$     { report_error("Unterminated string literal"); }
 .               { report_error("Unknown Character"); }
 
 %%

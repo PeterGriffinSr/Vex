@@ -63,5 +63,5 @@ Try this:
 # What's Next?
 Now that you’re set up, explore the rest of the documentation:
 - [Syntax Overview](/docs/vex/syntax.md)
-- [Type System](docs/vex/type-system.md)
-- [Functions](docs/vex/function.md)
+- [Type System](/docs/vex/type-system.md)
+- [Functions](/docs/vex/function.md)
