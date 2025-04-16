@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include "include/memory.h"
+#include "memory.h"
 
 Arena *arena_create(size_t size) {
     Arena *arena = malloc(sizeof(Arena));

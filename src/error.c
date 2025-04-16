@@ -1,6 +1,6 @@
 #include <stdlib.h>
-#include "include/error.h"
-#include "include/color.h"
+#include "error.h"
+#include "color.h"
 
 extern int yylineno;
 extern int yycolumn;

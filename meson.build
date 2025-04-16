@@ -47,6 +47,7 @@ srcs = [
   'src/main.c',
   'src/memory.c',
   'src/error.c',
+  'src/common.c',
   parser_c,
   lexer_c
 ]

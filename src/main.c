@@ -3,11 +3,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif // _WIN32
 
-#include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include "include/ast.h"
-#include "include/memory.h"
+#include "include/common.h"
 #include "parser.h"
 
 Arena *global_arena = NULL;
@@ -17,12 +14,18 @@ extern const char *filename;
 extern void yylex_destroy(void);
 
 int main(int argc, char *argv[]) {
-    global_arena = arena_create(1024 * 1024);
-
     if (argc < 2) {
         fputs("vex: error: no input file\n", stderr);
         return EXIT_FAILURE;
     }
+
+    for (int i = 1; i < argc; i++) {
+        if (handleCliOption(argv[i])) {
+            return EXIT_SUCCESS;
+        }
+    }
+
+    global_arena = arena_create(1024 * 1024);
 
     filename = argv[1];
     FILE *file = fopen(filename, "r");

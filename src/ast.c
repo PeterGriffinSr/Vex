@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "include/ast.h"
-#include "include/memory.h"
+#include "ast.h"
+#include "memory.h"
 
 extern Arena *global_arena;
 
@@ -27,6 +27,12 @@ ASTNode *create_float_node(double value) {
 ASTNode *create_char_node(char value) {
     ASTNode *node = alloc_node(NodeCharLit);
     node->charval = value;
+    return node;
+}
+
+ASTNode *create_bool_node(int value) {
+    ASTNode *node = alloc_node(NodeBoolLit);
+    node->boolval = value;
     return node;
 }
 
@@ -64,6 +70,24 @@ ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right) {
     return node;
 }
 
+ASTNode *create_list_node(ASTNode **elements, int count) {
+    ASTNode *node = alloc_node(NodeList);
+    node->list.elements = elements;
+    node->list.count = count;
+    return node;
+}
+
+ASTNode *build_list(ASTNode **items, int count) {
+    return create_list_node(items, count);
+}
+
+ASTNode *create_unary_node(const char *op, ASTNode *operand) {
+    ASTNode *node = alloc_node(NodeUnaryExpr);
+    node->unary_expr.op = op;
+    node->unary_expr.operand = operand;
+    return node;
+}
+
 void printAST(ASTNode *node, int indent) {
     if (!node) return;
 
@@ -84,6 +108,9 @@ void printAST(ASTNode *node, int indent) {
         case NodeStringLit:
             printf("StringLiteral: %s\n", node->strval);
             break;
+        case NodeBoolLit:
+            printf("BoolLiteral: %d\n", node->boolval);
+            break;
         case NodeIdentifier:
             printf("Identifier: %s\n", node->strval);
             break;
@@ -92,6 +119,10 @@ void printAST(ASTNode *node, int indent) {
             printAST(node->binary_expr.left, indent + 1);
             printAST(node->binary_expr.right, indent + 1);
             break;
+        case NodeUnaryExpr:
+            printf("UnaryExpr: '%s'\n", node->unary_expr.op);
+            printAST(node->unary_expr.operand, indent + 1);
+            break;
         case NodeVarDecl:
             printf("VarDecl: ");
             printf("Type: %s, ", node->var_decl.type ? node->var_decl.type : "<inferred>");
@@ -99,6 +130,12 @@ void printAST(ASTNode *node, int indent) {
             if (node->var_decl.expr) {
                 printf(" =\n");
                 printAST(node->var_decl.expr, indent + 1);
+            }
+            break;
+        case NodeList:
+            printf("List:\n");
+            for (int i = 0; i < node->list.count; i++) {
+                printAST(node->list.elements[i], indent + 1);
             }
             break;
         default:

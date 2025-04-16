@@ -3,8 +3,8 @@
 ## Vex
 A sample of fibonacci sequence in Vex.
 ```ocaml
-let rec factorial(n) =
-    if n == 0 then 1 else n * factorial(n - 1);
+let rec fib(n) =
+    if n <= 1 then n else fib(n - 1) + fib(n - 2);
 ```
 ## C++
 ```cpp

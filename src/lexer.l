@@ -45,8 +45,14 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "!="            { yycolumn += yyleng; return NotEqual; }
 "<="            { yycolumn += yyleng; return LessEqual; }
 ">="            { yycolumn += yyleng; return GreaterEqual; }
+"||"            { yycolumn += yyleng; return LogicalOr; }
+"&&"            { yycolumn += yyleng; return LogicalAnd; }
 "=>"            { yycolumn += yyleng; return ThiccArrow; }
 "->"            { yycolumn += yyleng; return SkinnyArrow; }
+"+."            { yycolumn += yyleng; return PlusFloat; }
+"-."            { yycolumn += yyleng; return MinusFloat; }
+"*."            { yycolumn += yyleng; return StarFloat; }
+"/."            { yycolumn += yyleng; return SlashFloat; }
 
 "..."           { yycolumn += yyleng; return Spread; }
 
@@ -62,11 +68,14 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "Some"          { yycolumn += yyleng; return Some; }
 "Ok"            { yycolumn += yyleng; return Ok; }
 "Error"         { yycolumn += yyleng; return Error; }
+"not"           { yycolumn += yyleng; return Not; }
 "int"           { yycolumn += yyleng; return Int; }
 "char"          { yycolumn += yyleng; return Char; }
 "bool"          { yycolumn += yyleng; return Bool; }
 "float"         { yycolumn += yyleng; return Float; }
 "string"        { yycolumn += yyleng; return String; }
+"true"          { yycolumn += yyleng; yylval.boolval = 1; return BoolLit; }
+"false"         { yycolumn += yyleng; yylval.boolval = 0; return BoolLit; }
 
 "print"         { yycolumn += yyleng; return Print; }
 "map"           { yycolumn += yyleng; return Map; }
