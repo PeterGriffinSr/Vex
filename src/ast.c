@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdarg.h>
 #include "ast.h"
 #include "memory.h"
 
@@ -88,6 +89,62 @@ ASTNode *create_unary_node(const char *op, ASTNode *operand) {
     return node;
 }
 
+ASTNode *create_block_node(ASTNode **stmts, int count) {
+    ASTNode *node = arena_alloc(global_arena, sizeof(ASTNode));
+    node->type = NodeBlock;
+    node->block.statements = stmts;
+    node->block.count = count;
+    return node;
+}
+
+ASTNode *create_if_stmt_node(ASTNode *condition, ASTNode *then_branch, ASTNode *else_branch) {
+    ASTNode *node = alloc_node(NodeIf);
+    node->type = NodeIf;
+    node->if_stmt.condition = condition;
+    node->if_stmt.then_branch = then_branch;
+    node->if_stmt.else_branch = else_branch;
+    return node;
+}
+
+ASTNode *create_function_node(const char *name, struct Param *params, int param_count, int is_recursive, ASTNode *expr) {
+    ASTNode *node = alloc_node(NodeFunction);
+    node->function.name = name;
+    node->function.param_count = param_count;
+    node->function.is_recursive = is_recursive;
+    node->function.expr = expr;
+    if (params) {
+        const char **names = arena_alloc(global_arena, sizeof(char *) * (size_t)param_count);
+        const char **types = arena_alloc(global_arena, sizeof(char *) * (size_t)param_count);
+        for (int i = 0; i < param_count; i++) {
+            names[i] = params[i].name;
+            types[i] = params[i].type;
+        }
+        node->function.param_names = names;
+        node->function.param_types = types;
+    } else {
+        node->function.param_names = NULL;
+        node->function.param_types = NULL;
+    }
+    return node;
+}
+
+ASTNode *create_call_node(ASTNode *callee, ASTNode **args, int arg_count) {
+    ASTNode *node = alloc_node(NodeCall);
+    node->type = NodeCall;
+    node->call.callee = callee;
+    node->call.args = args;
+    node->call.arg_count = arg_count;
+    return node;
+}
+
+void indent_print(int indent, const char *fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    for (int i = 0; i < indent; i++) printf("  ");
+    vprintf(fmt, args);
+    va_end(args);
+}
+
 void printAST(ASTNode *node, int indent) {
     if (!node) return;
 
@@ -138,6 +195,45 @@ void printAST(ASTNode *node, int indent) {
                 printAST(node->list.elements[i], indent + 1);
             }
             break;
+        case NodeBlock:
+            printf("Block:\n");
+            for (int i = 0; i < node->block.count; i++) {
+                printAST(node->block.statements[i], indent + 1);
+            }
+            break;
+        case NodeIf:
+            printf("If:\n");
+            indent_print(indent + 1, "Condition:\n");
+            printAST(node->if_stmt.condition, indent + 2);
+            indent_print(indent, "Then:\n");
+            printAST(node->if_stmt.then_branch, indent + 2);
+            indent_print(indent, "Else:\n");
+            printAST(node->if_stmt.else_branch, indent + 2);
+            break;
+        case NodeFunction:
+            indent_print(indent, "Function: %s%s\n", node->function.name, node->function.is_recursive ? " (rec)" : "");
+            if (node->function.param_count > 0) {
+                indent_print(indent + 1, "Params:\n");
+                for (int i = 0; i < node->function.param_count; i++) {
+                    if (node->function.param_types && node->function.param_types[i])
+                        indent_print(indent + 2, "%s: %s\n", node->function.param_names[i], node->function.param_types[i]);
+                    else
+                        indent_print(indent + 2, "%s\n", node->function.param_names[i]);
+                }
+            }
+            indent_print(indent + 1, "Body:\n");
+            printAST(node->function.expr, indent + 2);
+            break; 
+        case NodeCall:
+            printf("Call:\n");
+            printAST(node->call.callee, indent + 1);
+            for (int i = 0; i < node->call.arg_count; i++) {
+                indent_print(indent + 1, NULL);
+                printf("Arg %d:\n", i);
+                printAST(node->call.args[i], indent + 2);
+            }
+            break;
+                   
         default:
             return;
     }

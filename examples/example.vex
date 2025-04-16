@@ -1,1 +1,2 @@
-let x = 5.0 -. -5.1;
+let rec fib() =
+    if n <= 1 then n else fib(n - 1) + fib(n - 2);
