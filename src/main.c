@@ -1,3 +1,4 @@
+#include "memory.h"
 #ifdef _WIN32
 // Silence deprecation warnings on Windows
 #define _CRT_SECURE_NO_WARNINGS
@@ -38,6 +39,7 @@ int main(int argc, char *argv[]) {
 
     if (yyparse() == 0) {
         printAST(root, 0);
+        arena_new_line();
     } else {
         printf("Parsing failed.\n");
     }

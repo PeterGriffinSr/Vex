@@ -137,6 +137,21 @@ ASTNode *create_call_node(ASTNode *callee, ASTNode **args, int arg_count) {
     return node;
 }
 
+ASTNode *create_print_node(ASTNode *value, PrintKind kind) {
+    ASTNode *node = alloc_node(NodePrint);
+    node->print.value = value;
+    node->print.kind = kind;
+    return node;
+}
+
+ASTNode *create_higher_order_node(const char *param_type, const char *return_type) {
+    ASTNode *node = alloc_node(NodeHigherOrder);
+    node->type = NodeHigherOrder;
+    node->higher_order.param_type = param_type;
+    node->higher_order.return_type = return_type;
+    return node;
+} 
+
 void indent_print(int indent, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -215,10 +230,21 @@ void printAST(ASTNode *node, int indent) {
             if (node->function.param_count > 0) {
                 indent_print(indent + 1, "Params:\n");
                 for (int i = 0; i < node->function.param_count; i++) {
-                    if (node->function.param_types && node->function.param_types[i])
-                        indent_print(indent + 2, "%s: %s\n", node->function.param_names[i], node->function.param_types[i]);
-                    else
-                        indent_print(indent + 2, "%s\n", node->function.param_names[i]);
+                    if (node->function.param_types && node->function.param_types[i]) {
+                        ASTNode *type_node = (ASTNode *)node->function.param_types[i];
+                
+                        if (((ASTNode *)type_node)->type == NodeHigherOrder) {
+                            ASTNode *ho = (ASTNode *)type_node;
+                            indent_print(indent + 2, "%s: (%s) -> %s\n", node->function.param_names[i],
+                                         ho->higher_order.param_type,
+                                         ho->higher_order.return_type);
+                        } else {
+                            indent_print(indent + 2, "%s: %s\n", node->function.param_names[i],
+                                         node->function.param_types[i]);
+                        }
+                    } else {
+                        indent_print(indent + 2, "%s: <inferred>\n", node->function.param_names[i]);
+                    }
                 }
             }
             indent_print(indent + 1, "Body:\n");
@@ -233,7 +259,10 @@ void printAST(ASTNode *node, int indent) {
                 printAST(node->call.args[i], indent + 2);
             }
             break;
-                   
+        case NodePrint:
+            printf("Print:\n");
+            printAST(node->print.value, indent + 1);
+            break;
         default:
             return;
     }

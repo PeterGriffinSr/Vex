@@ -31,7 +31,7 @@ Note: Ensure you have `meson`, a C compiler (like `gcc` or `clang`), and `flex/b
 Create a file called `main.vex` with the following content:
 ```
 let main() =
-    print("Hello, world");
+    print_string "Hello, world";
 ```
 To run it:
 ```

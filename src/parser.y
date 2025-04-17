@@ -24,14 +24,8 @@ void yyerror(const char *s) {
     char charval;
     int boolval;
     struct ASTNode* node;
-    struct NodeList {
-        struct ASTNode **elements;
-        int count;
-    } node_list;
-    struct ParamList {
-        struct Param *elements;
-        int count;
-    } param_list;
+    struct NodeList { struct ASTNode **elements; int count; } node_list;
+    struct ParamList { struct Param *elements; int count; } param_list;
 }
 
 %token <intval> IntLit
@@ -56,7 +50,7 @@ void yyerror(const char *s) {
 %token Equal NotEqual LessEqual GreaterEqual ThiccArrow SkinnyArrow Spread PlusFloat MinusFloat StarFloat SlashFloat LogicalAnd LogicalOr 
 %token Let Type Match With If Else Rec None Some Ok Error Then Not
 %token Int Float Char String Bool
-%token Print Map Filter
+%token PrintEndline PrintInt PrintFloat PrintChar PrintString Map Filter
 
 %type <node> statement expr var_decl func_def primary_expr
 %type <node_list> statement_list expr_list
@@ -83,6 +77,7 @@ type:
     | Char { $$ = "char"; }
     | String { $$ = "string"; }
     | Bool { $$ = "bool"; }
+    | LParen type RParen SkinnyArrow type { $$ = create_higher_order_node($2, $5); }
 
 expr:
     expr Plus expr         { $$ = create_binary_node("+", $1, $3); }
@@ -115,6 +110,11 @@ primary_expr:
   | LParen expr RParen     { $$ = $2; }
   | LBracket expr_list RBracket { $$ = build_list($2.elements, $2.count); }
   | If expr Then expr Else expr { $$ = create_if_stmt_node($2, $4, $6); }
+  | PrintEndline expr { $$ = create_print_node($2, NodePrintEndLine); }
+  | PrintInt expr { $$ = create_print_node($2, NodePrintInt); }
+  | PrintFloat expr { $$ = create_print_node($2, NodePrintFloat); }
+  | PrintChar expr { $$ = create_print_node($2, NodePrintChar); }
+  | PrintString expr { $$ = create_print_node($2, NodePrintString); }
   | primary_expr LParen expr_list RParen { $$ = create_call_node($1, $3.elements, $3.count); }
   | primary_expr LParen RParen { $$ = create_call_node($1, NULL, 0); }
 

@@ -71,26 +71,28 @@ Expressions are the core of Vex. Here's a breakdown:
 
 ### If Expressions
 ```ocaml
-let result = if x > 0 then "positive" else "non-positive";
+let result(x) =
+    if x > 0 then "positive" else "non-positive";
 ```
 - `if` always requires an `else`.
 
 ### Match Expressions
 ```ocaml
-let describe(opt) = match opt with
+let describe(opt) = 
+    match opt with
     | Some(x) => "Got " + string(x)
     | None => "Nothing";
 ```
 
 ### Lambda Expressions
 ```ocaml
-let square = (x) => x * x;
+let square() = 
+    (x) => x * x;
 ```
 - Anonymous functions using arrow notation.
 
 ### Function Calls
 ```ocaml
-print("Hi");
 add(1, 2);
 ```
 - Function name followed by arguments in parentheses.
@@ -107,7 +109,7 @@ add(1, 2);
 Functions can take multiple parameters:
 ```ocaml
 let greet(name, age) = 
-    print("Hello " + name);
+    print_string "Hello " >> name;
 ```
 Calls pass arguments in the same format:
 ```ocaml
@@ -131,6 +133,7 @@ Patterns appear in `match` cases and can include:
 ### Parenthesized Expressions
 Use parentheses to group expressions or override precedence:
 ```ocaml
-let result = (2 + 3) * 4;
+let result() = 
+    (2 + 3) * 4;
 ```
 ---

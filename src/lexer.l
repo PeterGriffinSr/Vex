@@ -77,7 +77,11 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "true"          { yycolumn += yyleng; yylval.boolval = 1; return BoolLit; }
 "false"         { yycolumn += yyleng; yylval.boolval = 0; return BoolLit; }
 
-"print"         { yycolumn += yyleng; return Print; }
+"print_endline" { yycolumn += yyleng; return PrintEndline; }
+"print_int"     { yycolumn += yyleng; return PrintInt; }
+"print_float"   { yycolumn += yyleng; return PrintFloat; }
+"print_char"    { yycolumn += yyleng; return PrintChar; }
+"print_string"  { yycolumn += yyleng; return PrintString; }
 "map"           { yycolumn += yyleng; return Map; }
 "filter"        { yycolumn += yyleng; return Filter; }
 

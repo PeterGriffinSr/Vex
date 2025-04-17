@@ -31,7 +31,8 @@ let double(n) = n * 2;   # inferred: int -> int
 
 You can add type annotations if desired:
 ```ocaml
-let double(n: int): int = n * 2;
+let double(n: int) = 
+    n * 2;
 ```
 
 ---
@@ -39,7 +40,7 @@ let double(n: int): int = n * 2;
 ## Function Types
 Functions are first-class and have arrow types:
 ```ocaml
-let add(a: int, b: int): int = 
+let add(a: int, b: int) = 
     a + b;
 ```
 - Type: `(int, int) -> int`
@@ -64,7 +65,7 @@ type Result = Ok(string) | Error(string);
 ### Pattern Matching with Types
 You can match custom types easily:
 ```ocaml
-let describe(opt: Option): string = 
+let describe(opt: Option) = 
     match opt with
         | Some(x) => "Got " + string(x)
         | None => "Nothing";

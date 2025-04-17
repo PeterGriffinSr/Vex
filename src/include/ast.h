@@ -17,10 +17,20 @@ typedef enum {
     NodeIf,
     NodeFunction,
     NodeCall,
+    NodePrint,
+    NodeHigherOrder,
     NodeBinaryExpr
 } NodeType;
 
 typedef struct ASTNode ASTNode;
+
+typedef enum {
+    NodePrintInt,
+    NodePrintFloat,
+    NodePrintChar,
+    NodePrintString,
+    NodePrintEndLine,
+} PrintKind;
 
 struct Param {
     const char *name;
@@ -80,6 +90,15 @@ struct ASTNode {
             ASTNode **args;
             int arg_count;
         } call;
+
+        struct {
+            ASTNode *value;
+            PrintKind kind;
+        } print;
+
+        struct {
+            const char *param_type, *return_type;
+        } higher_order;
     };
 };
 
@@ -92,10 +111,12 @@ ASTNode *create_string_node(const char *value);
 ASTNode *create_identifier_node(const char *value);
 ASTNode *create_block_node(ASTNode **stmts, int count);
 ASTNode *create_list_node(ASTNode **elements, int count);
+ASTNode *create_print_node(ASTNode *value, PrintKind kind);
 ASTNode *create_unary_node(const char *op, ASTNode *operand);
 ASTNode *create_call_node(ASTNode *callee, ASTNode **args, int arg_count);
 ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right);
 ASTNode *create_var_decl_node(const char* value, const char *type, ASTNode *expr);
+ASTNode *create_higher_order_node(const char *param_type, const char *return_type);
 ASTNode *create_if_stmt_node(ASTNode *condition, ASTNode *then_branch, ASTNode *else_branch);
 ASTNode *create_function_node(const char *name, struct Param *params, int param_count, int is_recursive, ASTNode *expr);
 
