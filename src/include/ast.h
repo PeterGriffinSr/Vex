@@ -24,14 +24,6 @@ typedef enum {
 
 typedef struct ASTNode ASTNode;
 
-typedef enum {
-    NodePrintInt,
-    NodePrintFloat,
-    NodePrintChar,
-    NodePrintString,
-    NodePrintEndLine,
-} PrintKind;
-
 struct Param {
     const char *name;
     const char *type;
@@ -93,7 +85,7 @@ struct ASTNode {
 
         struct {
             ASTNode *value;
-            PrintKind kind;
+            const char *type;
         } print;
 
         struct {
@@ -111,7 +103,7 @@ ASTNode *create_string_node(const char *value);
 ASTNode *create_identifier_node(const char *value);
 ASTNode *create_block_node(ASTNode **stmts, int count);
 ASTNode *create_list_node(ASTNode **elements, int count);
-ASTNode *create_print_node(ASTNode *value, PrintKind kind);
+ASTNode *create_print_node(ASTNode *value, const char *type);
 ASTNode *create_unary_node(const char *op, ASTNode *operand);
 ASTNode *create_call_node(ASTNode *callee, ASTNode **args, int arg_count);
 ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right);

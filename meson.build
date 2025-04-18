@@ -48,6 +48,7 @@ srcs = [
   'src/memory.c',
   'src/error.c',
   'src/common.c',
+  'src/tc.c',
   parser_c,
   lexer_c
 ]

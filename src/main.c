@@ -6,6 +6,7 @@
 
 #include <stdlib.h>
 #include "include/common.h"
+#include "include/tc.h"
 #include "parser.h"
 
 Arena *global_arena = NULL;
@@ -43,6 +44,7 @@ int main(int argc, char *argv[]) {
     } else {
         printf("Parsing failed.\n");
     }
+    typecheck(root);
 
     fclose(file);
     arena_destroy(global_arena);

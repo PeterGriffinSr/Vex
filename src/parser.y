@@ -50,7 +50,7 @@ void yyerror(const char *s) {
 %token Equal NotEqual LessEqual GreaterEqual ThiccArrow SkinnyArrow Spread PlusFloat MinusFloat StarFloat SlashFloat LogicalAnd LogicalOr 
 %token Let Type Match With If Else Rec None Some Ok Error Then Not
 %token Int Float Char String Bool
-%token PrintEndline PrintInt PrintFloat PrintChar PrintString Map Filter
+%token Print Map Filter
 
 %type <node> statement expr var_decl func_def primary_expr
 %type <node_list> statement_list expr_list
@@ -77,44 +77,40 @@ type:
     | Char { $$ = "char"; }
     | String { $$ = "string"; }
     | Bool { $$ = "bool"; }
-    | LParen type RParen SkinnyArrow type { $$ = create_higher_order_node($2, $5); }
+    | LParen type RParen SkinnyArrow type { $$ = (const char *)create_higher_order_node($2, $5); }
 
 expr:
-    expr Plus expr         { $$ = create_binary_node("+", $1, $3); }
-  | expr Minus expr        { $$ = create_binary_node("-", $1, $3); }
-  | expr Star expr         { $$ = create_binary_node("*", $1, $3); }
-  | expr Slash expr        { $$ = create_binary_node("/", $1, $3); }
-  | expr PlusFloat expr    { $$ = create_binary_node("+.", $1, $3); }
-  | expr MinusFloat expr   { $$ = create_binary_node("-.", $1, $3); }
-  | expr StarFloat expr    { $$ = create_binary_node("*.", $1, $3); }
-  | expr SlashFloat expr   { $$ = create_binary_node("/.", $1, $3); }
-  | expr Less expr         { $$ = create_binary_node("<", $1, $3); }
-  | expr Greater expr      { $$ = create_binary_node(">", $1, $3); }
-  | expr Equal expr        { $$ = create_binary_node("==", $1, $3); }
-  | expr NotEqual expr     { $$ = create_binary_node("!=", $1, $3); }
-  | expr LessEqual expr    { $$ = create_binary_node("<=", $1, $3); }
+    expr Plus expr { $$ = create_binary_node("+", $1, $3); }
+  | expr Minus expr { $$ = create_binary_node("-", $1, $3); }
+  | expr Star expr { $$ = create_binary_node("*", $1, $3); }
+  | expr Slash expr { $$ = create_binary_node("/", $1, $3); }
+  | expr PlusFloat expr { $$ = create_binary_node("+.", $1, $3); }
+  | expr MinusFloat expr { $$ = create_binary_node("-.", $1, $3); }
+  | expr StarFloat expr { $$ = create_binary_node("*.", $1, $3); }
+  | expr SlashFloat expr { $$ = create_binary_node("/.", $1, $3); }
+  | expr Less expr { $$ = create_binary_node("<", $1, $3); }
+  | expr Greater expr { $$ = create_binary_node(">", $1, $3); }
+  | expr Equal expr { $$ = create_binary_node("==", $1, $3); }
+  | expr NotEqual expr { $$ = create_binary_node("!=", $1, $3); }
+  | expr LessEqual expr { $$ = create_binary_node("<=", $1, $3); }
   | expr GreaterEqual expr { $$ = create_binary_node(">=", $1, $3); }
-  | expr LogicalAnd expr   { $$ = create_binary_node("&&", $1, $3); }
-  | expr LogicalOr expr    { $$ = create_binary_node("||", $1, $3); }
-  | Minus expr             { $$ = create_unary_node("-", $2); }
-  | Not expr               { $$ = create_unary_node("not", $2); }
-  | primary_expr           { $$ = $1; }
+  | expr LogicalAnd expr { $$ = create_binary_node("&&", $1, $3); }
+  | expr LogicalOr expr { $$ = create_binary_node("||", $1, $3); }
+  | Minus expr { $$ = create_unary_node("-", $2); }
+  | Not expr { $$ = create_unary_node("not", $2); }
+  | primary_expr { $$ = $1; }
 
 primary_expr:
-    IntLit                 { $$ = create_int_node($1); }
-  | FloatLit               { $$ = create_float_node($1); }
-  | CharLit                { $$ = create_char_node($1); }
-  | StringLit              { $$ = create_string_node($1); }
-  | Ident                  { $$ = create_identifier_node($1); }
-  | BoolLit                { $$ = create_bool_node($1); }
-  | LParen expr RParen     { $$ = $2; }
+    IntLit { $$ = create_int_node($1); }
+  | FloatLit { $$ = create_float_node($1); }
+  | CharLit { $$ = create_char_node($1); }
+  | StringLit { $$ = create_string_node($1); }
+  | Ident { $$ = create_identifier_node($1); }
+  | BoolLit { $$ = create_bool_node($1); }
+  | LParen expr RParen { $$ = $2; }
   | LBracket expr_list RBracket { $$ = build_list($2.elements, $2.count); }
   | If expr Then expr Else expr { $$ = create_if_stmt_node($2, $4, $6); }
-  | PrintEndline expr { $$ = create_print_node($2, NodePrintEndLine); }
-  | PrintInt expr { $$ = create_print_node($2, NodePrintInt); }
-  | PrintFloat expr { $$ = create_print_node($2, NodePrintFloat); }
-  | PrintChar expr { $$ = create_print_node($2, NodePrintChar); }
-  | PrintString expr { $$ = create_print_node($2, NodePrintString); }
+  | Print Less type Greater expr { $$ = create_print_node($5, $3); }
   | primary_expr LParen expr_list RParen { $$ = create_call_node($1, $3.elements, $3.count); }
   | primary_expr LParen RParen { $$ = create_call_node($1, NULL, 0); }
 

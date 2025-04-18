@@ -137,10 +137,10 @@ ASTNode *create_call_node(ASTNode *callee, ASTNode **args, int arg_count) {
     return node;
 }
 
-ASTNode *create_print_node(ASTNode *value, PrintKind kind) {
+ASTNode *create_print_node(ASTNode *value, const char *type) {
     ASTNode *node = alloc_node(NodePrint);
     node->print.value = value;
-    node->print.kind = kind;
+    node->print.type = type;
     return node;
 }
 
@@ -261,7 +261,8 @@ void printAST(ASTNode *node, int indent) {
             break;
         case NodePrint:
             printf("Print:\n");
-            printAST(node->print.value, indent + 1);
+            indent_print(indent + 1, "Type: %s\n", node->print.type);
+            printAST(node->print.value, indent + 2);
             break;
         default:
             return;
