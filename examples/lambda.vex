@@ -1,0 +1,2 @@
+val (int, int) -> int: fn (x, y) => 
+    x + y;

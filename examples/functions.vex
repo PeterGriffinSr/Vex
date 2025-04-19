@@ -1,0 +1,11 @@
+val (int, int) -> int: add fn (a, b) =>
+    a + b;
+
+val (int, int) -> int: sub fn (a, b) =>
+    a - b;
+
+val (float, float) -> int: mul fn (a, b) =>
+    <int>a * b;
+
+val (int) -> int: fact fn (n) =>
+    if n <= 1 then 1 else n * fact(n - 1);

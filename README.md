@@ -12,7 +12,8 @@ To start using Vex, follow these simple steps:
 1. **Installation**: Download and install Vex from the [offical website](#)
 2. **Hello, world**: Create your first Vex program:
     ```ocaml
-    let main() =
-        print("Hello, world");
+    val () -> int: main fn () =>
+        print<string> "Hello, world";
+        0;
     ```
 3. **Explore the Documentation**: Check out the [Vex documentation](/docs/vex/getting-started.md) for detailed guides, tutorials, and API references.

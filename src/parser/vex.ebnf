@@ -1,0 +1,57 @@
+(* Terminals *)
+identifier    = letter , { letter | digit | "_" } ;
+integer       = ["-"] , digit , { digit } ;
+float         = ["-"] , digit , { digit } , "." , digit , { digit } ;
+char          = "'" , any_char_except_single_quote , "'" ;
+string        = '"' , { any_char_except_double_quote } , '"' ;
+
+(* Types *)
+type_id       = "int" | "float" | "bool" | "char" | "string" | list_type | custom_type ;
+list_type     = "list" "<" , type_id , ">" ;
+custom_type   = identifier ;
+
+type_sig      = "(" , [ type_id , { "," , type_id } ] , ")" , "->" , type_id ;
+
+(* Values *)
+literal       = integer | float | char | string | "true" | "false" ;
+
+(* Top-level Declarations *)
+declaration   = val_decl | type_decl ;
+
+val_decl      = "val" , type_sig , ":" , identifier , "fn" , "(" , [ parameters ] , ")" , "=>" , expression , ";" ;
+
+type_decl     = "type" , identifier , "=" , variant , { "|" , variant } , ";" ;
+variant       = identifier , [ "(" , type_id , ")" ] ;
+
+parameters    = param , { "," , param } ;
+param         = identifier ;
+
+(* Expressions *)
+expression    = if_expr
+              | match_expr
+              | lambda_expr
+              | binary_expr
+              | function_call
+              | list_expr
+              | literal
+              | identifier
+              | "(" , expression , ")" ;
+
+if_expr       = "if" , expression , "then" , expression , "else" , expression ;
+
+match_expr    = "match" , expression , "with" , match_case , { "|" , match_case } ;
+match_case    = pattern , "=>" , expression ;
+pattern       = identifier , [ "(" , identifier , ")" ] | identifier ;
+
+lambda_expr   = "fn" , "(" , [ parameters ] , ")" , "=>" , expression ;
+
+function_call = identifier , "(" , [ arguments ] , ")" ;
+arguments     = expression , { "," , expression } ;
+
+list_expr     = "[" , [ expression , { "," , expression } ] , "]" ;
+
+binary_expr   = expression , binary_op , expression ;
+binary_op     = "+" | "-" | "*" | "/" | "+." | "-." | "*." | "/." | "==" | "!=" | "<" | ">" | "<=" | ">=" | "&&" | "||" | "|>" ;
+
+(* Entry Point *)
+program       = { declaration } ;

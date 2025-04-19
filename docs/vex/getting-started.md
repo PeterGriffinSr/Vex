@@ -10,13 +10,13 @@ To install Vex, follow these steps:
 
 ### Using Prebuilt Binaries (Recommended)
 1. Visit the [official Vex website](#) and download the latest release for your operating system.
-2. Extract the archive and add the `vex` binary to your system's `PATH`.
+2. Extract the archive and add the `Vex` binary to your system's `PATH`.
 
 ### Building from Source
 If you prefer building from source:
 
 ```
-git clone https://github.com/PeterGriffinSr/vex.git
+git clone https://github.com/PeterGriffinSr/Vex.git
 cd vex
 meson setup build
 meson compile -C build
@@ -30,8 +30,9 @@ Note: Ensure you have `meson`, a C compiler (like `gcc` or `clang`), and `flex/b
 # Your First Vex Program
 Create a file called `main.vex` with the following content:
 ```
-let main() =
-    print_string "Hello, world";
+val () -> int: main fn () =>
+    print<string> "Hello, world";
+    0;
 ```
 To run it:
 ```
@@ -53,8 +54,8 @@ vex repl
 
 Try this:
 ```
-> let square(x: int) = x * x;
-> sqaure(4)
+> val (int) -> int: sqaure fn (x) => x * x;
+> sqaure(4);
 > 16
 ```
 
@@ -64,4 +65,3 @@ Try this:
 Now that you’re set up, explore the rest of the documentation:
 - [Syntax Overview](/docs/vex/syntax.md)
 - [Type System](/docs/vex/type-system.md)
-- [Functions](/docs/vex/function.md)

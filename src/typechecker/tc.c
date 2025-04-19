@@ -119,7 +119,6 @@ TypeTC *typecheck_function(ASTNode *node, TypeEnv *parent_env) {
     return ret_type;
 }
 
-
 TypeTC *infer_from_binary_op(const char *op, TypeTC *other) {
     if (strcmp(op, "+") == 0 || strcmp(op, "-") == 0 ||
         strcmp(op, "*") == 0 || strcmp(op, "/") == 0)

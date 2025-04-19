@@ -29,26 +29,26 @@ flex = find_program('flex', required: true)
 bison = find_program('bison', required: true)
 
 parser_c = custom_target('parser.c',
-  input: 'src/parser.y',
+  input: 'src/parser/parser.y',
   output: ['parser.c', 'parser.h'],
   command: [bison, '-d', '-o', '@OUTPUT0@', '@INPUT@'],
-  depend_files: ['src/parser.y']
+  depend_files: ['src/parser/parser.y']
 )
 
 lexer_c = custom_target('lexer.c',
-  input: 'src/lexer.l',
+  input: 'src/parser/lexer.l',
   output: 'lex.yy.c',
   command: [flex, '-o', '@OUTPUT@', '@INPUT@'],
-  depend_files: ['src/lexer.l']
+  depend_files: ['src/parser/lexer.l']
 )
 
 srcs = [
-  'src/ast.c',
+  'src/ast/ast.c',
   'src/main.c',
-  'src/memory.c',
-  'src/error.c',
-  'src/common.c',
-  'src/tc.c',
+  'src/core/memory.c',
+  'src/core/error.c',
+  'src/core/common.c',
+  'src/typechecker/tc.c',
   parser_c,
   lexer_c
 ]
