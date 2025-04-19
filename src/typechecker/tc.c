@@ -58,79 +58,6 @@ TypeTC *typecheck_binary(const char *op, TypeTC *left, TypeTC *right) {
     return make_type(TypeError);
 }
 
-TypeTC *typecheck_function(ASTNode *node, TypeEnv *parent_env) {
-    TypeEnv *env = parent_env;
-
-    for (int i = 0; i < node->function.param_count; i++) {
-        const char *annot = node->function.param_types[i];
-        TypeTC *param_type = NULL;
-
-        if (annot) {
-            if (strcmp(annot, "int") == 0) {
-                param_type = make_type(TypeInt);
-            } else if (strcmp(annot, "float") == 0) {
-                param_type = make_type(TypeFloat);
-            } else if (strcmp(annot, "bool") == 0) {
-                param_type = make_type(TypeBool);
-            } else if (strcmp(annot, "char") == 0) {
-                param_type = make_type(TypeChar);
-            } else if (strcmp(annot, "string") == 0) {
-                param_type = make_type(TypeString);
-            } else {
-                type_error("Unknown parameter type annotation");
-            }
-        } else {
-            param_type = make_type(TypeError);
-        }
-
-        env = add_binding(env, node->function.param_names[i], param_type);
-    }
-
-    TypeTC *ret_type = typecheck_expr_with_env(node->function.expr, env);
-
-    for (int i = 0; i < node->function.param_count; i++) {
-        const char *param_name = node->function.param_names[i];
-        TypeTC *param_type = lookup_type(env, param_name);
-
-        if (param_type->kind == TypeError) {
-            ASTNode *expr = node->function.expr;
-
-            if (expr->type == NodeBinaryExpr) {
-                TypeTC *left_type = typecheck_expr_with_env(expr->binary_expr.left, env);
-                TypeTC *right_type = typecheck_expr_with_env(expr->binary_expr.right, env);
-
-                if (expr->binary_expr.left->type == NodeIdentifier && 
-                    strcmp(expr->binary_expr.left->strval, param_name) == 0) {
-                    param_type = left_type;
-                } else if (expr->binary_expr.right->type == NodeIdentifier && 
-                           strcmp(expr->binary_expr.right->strval, param_name) == 0) {
-                    param_type = right_type;
-                }
-            }
-
-            if (param_type->kind == TypeError) {
-                type_error("Unable to infer parameter type from function body");
-            }
-
-            env = add_binding(env, param_name, param_type);
-        }
-    }
-
-    return ret_type;
-}
-
-TypeTC *infer_from_binary_op(const char *op, TypeTC *other) {
-    if (strcmp(op, "+") == 0 || strcmp(op, "-") == 0 ||
-        strcmp(op, "*") == 0 || strcmp(op, "/") == 0)
-        return other->kind == TypeInt ? make_type(TypeInt) : make_type(TypeError);
-
-    if (strcmp(op, "+.") == 0 || strcmp(op, "-.") == 0 ||
-        strcmp(op, "*.") == 0 || strcmp(op, "/.") == 0)
-        return other->kind == TypeFloat ? make_type(TypeFloat) : make_type(TypeError);
-
-    return make_type(TypeError);
-}
-
 void update_binding(TypeEnv *env, ASTNode *ident_node, TypeTC *new_type) {
     if (ident_node->type != NodeIdentifier) return;
 
@@ -155,22 +82,8 @@ TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
             TypeTC *left = typecheck_expr_with_env(node->binary_expr.left, env);
             TypeTC *right = typecheck_expr_with_env(node->binary_expr.right, env);
 
-            if (left->kind == TypeError && right->kind != TypeError) {
-                TypeTC *inferred = infer_from_binary_op(node->binary_expr.op, right);
-                update_binding(env, node->binary_expr.left, inferred);
-                left = inferred;
-            }
-        
-            if (right->kind == TypeError && left->kind != TypeError) {
-                TypeTC *inferred = infer_from_binary_op(node->binary_expr.op, left);
-                update_binding(env, node->binary_expr.right, inferred);
-                right = inferred;
-            }
-
             return typecheck_binary(node->binary_expr.op, left, right);
-        }
-        case NodeFunction:
-            return typecheck_function(node, env);
+        };
         case NodeIdentifier: {
             TypeTC *t = lookup_type(env, node->strval);
             if (!t) {
@@ -195,11 +108,11 @@ TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
                 } else if (strcmp(node->var_decl.type, "string") == 0) {
                     annot_type = make_type(TypeString);
                 } else {
-                    type_error("Unknown type annotation in let binding");
+                    type_error("Unknown type annotation in val binding");
                 }
         
                 if (annot_type->kind != value_type->kind) {
-                    type_error("Type mismatch in let binding");
+                    type_error("Type mismatch in val binding");
                 }
         
                 env = add_binding(env, node->var_decl.value, annot_type);
@@ -232,7 +145,7 @@ TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
                         } else if (strcmp(stmt->var_decl.type, "string") == 0) {
                             binding_type = make_type(TypeString);
                         } else {
-                            type_error("Unknown type annotation in block let binding");
+                            type_error("Unknown type annotation in block val binding");
                         }
                     }
         

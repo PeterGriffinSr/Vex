@@ -71,17 +71,6 @@ ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right) {
     return node;
 }
 
-ASTNode *create_list_node(ASTNode **elements, int count) {
-    ASTNode *node = alloc_node(NodeList);
-    node->list.elements = elements;
-    node->list.count = count;
-    return node;
-}
-
-ASTNode *build_list(ASTNode **items, int count) {
-    return create_list_node(items, count);
-}
-
 ASTNode *create_unary_node(const char *op, ASTNode *operand) {
     ASTNode *node = alloc_node(NodeUnaryExpr);
     node->unary_expr.op = op;
@@ -97,45 +86,6 @@ ASTNode *create_block_node(ASTNode **stmts, int count) {
     return node;
 }
 
-ASTNode *create_if_stmt_node(ASTNode *condition, ASTNode *then_branch, ASTNode *else_branch) {
-    ASTNode *node = alloc_node(NodeIf);
-    node->type = NodeIf;
-    node->if_stmt.condition = condition;
-    node->if_stmt.then_branch = then_branch;
-    node->if_stmt.else_branch = else_branch;
-    return node;
-}
-
-ASTNode *create_function_node(const char *name, struct Param *params, int param_count, int is_recursive, ASTNode *expr) {
-    ASTNode *node = alloc_node(NodeFunction);
-    node->function.name = name;
-    node->function.param_count = param_count;
-    node->function.is_recursive = is_recursive;
-    node->function.expr = expr;
-    if (params) {
-        const char **names = arena_alloc(global_arena, sizeof(char *) * (size_t)param_count);
-        const char **types = arena_alloc(global_arena, sizeof(char *) * (size_t)param_count);
-        for (int i = 0; i < param_count; i++) {
-            names[i] = params[i].name;
-            types[i] = params[i].type;
-        }
-        node->function.param_names = names;
-        node->function.param_types = types;
-    } else {
-        node->function.param_names = NULL;
-        node->function.param_types = NULL;
-    }
-    return node;
-}
-
-ASTNode *create_call_node(ASTNode *callee, ASTNode **args, int arg_count) {
-    ASTNode *node = alloc_node(NodeCall);
-    node->type = NodeCall;
-    node->call.callee = callee;
-    node->call.args = args;
-    node->call.arg_count = arg_count;
-    return node;
-}
 
 ASTNode *create_print_node(ASTNode *value, const char *type) {
     ASTNode *node = alloc_node(NodePrint);
@@ -143,14 +93,6 @@ ASTNode *create_print_node(ASTNode *value, const char *type) {
     node->print.type = type;
     return node;
 }
-
-ASTNode *create_higher_order_node(const char *param_type, const char *return_type) {
-    ASTNode *node = alloc_node(NodeHigherOrder);
-    node->type = NodeHigherOrder;
-    node->higher_order.param_type = param_type;
-    node->higher_order.return_type = return_type;
-    return node;
-} 
 
 void indent_print(int indent, const char *fmt, ...) {
     va_list args;
@@ -204,59 +146,10 @@ void printAST(ASTNode *node, int indent) {
                 printAST(node->var_decl.expr, indent + 1);
             }
             break;
-        case NodeList:
-            printf("List:\n");
-            for (int i = 0; i < node->list.count; i++) {
-                printAST(node->list.elements[i], indent + 1);
-            }
-            break;
         case NodeBlock:
             printf("Block:\n");
             for (int i = 0; i < node->block.count; i++) {
                 printAST(node->block.statements[i], indent + 1);
-            }
-            break;
-        case NodeIf:
-            printf("If:\n");
-            indent_print(indent + 1, "Condition:\n");
-            printAST(node->if_stmt.condition, indent + 2);
-            indent_print(indent, "Then:\n");
-            printAST(node->if_stmt.then_branch, indent + 2);
-            indent_print(indent, "Else:\n");
-            printAST(node->if_stmt.else_branch, indent + 2);
-            break;
-        case NodeFunction:
-            indent_print(indent, "Function: %s%s\n", node->function.name, node->function.is_recursive ? " (rec)" : "");
-            if (node->function.param_count > 0) {
-                indent_print(indent + 1, "Params:\n");
-                for (int i = 0; i < node->function.param_count; i++) {
-                    if (node->function.param_types && node->function.param_types[i]) {
-                        ASTNode *type_node = (ASTNode *)node->function.param_types[i];
-                
-                        if (((ASTNode *)type_node)->type == NodeHigherOrder) {
-                            ASTNode *ho = (ASTNode *)type_node;
-                            indent_print(indent + 2, "%s: (%s) -> %s\n", node->function.param_names[i],
-                                         ho->higher_order.param_type,
-                                         ho->higher_order.return_type);
-                        } else {
-                            indent_print(indent + 2, "%s: %s\n", node->function.param_names[i],
-                                         node->function.param_types[i]);
-                        }
-                    } else {
-                        indent_print(indent + 2, "%s: <inferred>\n", node->function.param_names[i]);
-                    }
-                }
-            }
-            indent_print(indent + 1, "Body:\n");
-            printAST(node->function.expr, indent + 2);
-            break; 
-        case NodeCall:
-            printf("Call:\n");
-            printAST(node->call.callee, indent + 1);
-            for (int i = 0; i < node->call.arg_count; i++) {
-                indent_print(indent + 1, NULL);
-                printf("Arg %d:\n", i);
-                printAST(node->call.args[i], indent + 2);
             }
             break;
         case NodePrint:

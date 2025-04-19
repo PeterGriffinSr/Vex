@@ -56,14 +56,14 @@ StringLiteral   \"(\\.|[^\\"])*\"
 
 "..."           { yycolumn += yyleng; return Spread; }
 
-"let"           { yycolumn += yyleng; return Let; }
+"val"           { yycolumn += yyleng; return Val; }
 "type"          { yycolumn += yyleng; return Type; }
 "match"         { yycolumn += yyleng; return Match; }
 "with"          { yycolumn += yyleng; return With; }
 "if"            { yycolumn += yyleng; return If; }
 "else"          { yycolumn += yyleng; return Else; }
 "then"          { yycolumn += yyleng; return Then; }
-"rec"           { yycolumn += yyleng; return Rec; }
+"fn"            { yycolumn += yyleng; return Fn; }
 "None"          { yycolumn += yyleng; return None; }
 "Some"          { yycolumn += yyleng; return Some; }
 "Ok"            { yycolumn += yyleng; return Ok; }

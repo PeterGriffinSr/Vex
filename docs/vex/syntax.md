@@ -94,7 +94,7 @@ So instead of saying “put 10 into x,” you're saying:
 > "x is defined as the integer 10 and cannot be changed."
 
 Which is conceptually the same as:
-$$x = 10 \space \bold{where} \space x \in \mathbb{Z}$$ 
+$$x = 10 \space \text{where} \space x \in \mathbb{Z}$$ 
 
 ---
 

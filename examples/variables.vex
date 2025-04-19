@@ -1,6 +1,6 @@
-val int: x = 10;
+val int: x = (5 + 1) * 3;
 val float: pi = 3.1415;
 val string: name = "Vex";
 val bool: flag = true;
-val list<int>: nums = [1, 2, 3, 4, 5];
-val list<string>: greetings = ["Hi", "Hello"];
+# val list<int>: nums = [1, 2, 3, 4, 5];
+# val list<string>: greetings = ["Hi", "Hello"];
