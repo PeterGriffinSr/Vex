@@ -14,6 +14,7 @@ typedef enum {
     NodeUnaryExpr,
     NodeBlock,
     NodePrint,
+    NodeList,
     NodeBinaryExpr
 } NodeType;
 
@@ -53,6 +54,11 @@ struct ASTNode {
             ASTNode *value;
             const char *type;
         } print;
+
+        struct {
+            ASTNode **elements;
+            int count;
+        } list;
     };
 };
 
@@ -62,8 +68,10 @@ ASTNode *create_bool_node(int value);
 ASTNode *create_char_node(char value);
 ASTNode *create_float_node(double value);
 ASTNode *create_string_node(const char *value);
+ASTNode *build_list(ASTNode **items, int count);
 ASTNode *create_identifier_node(const char *value);
 ASTNode *create_block_node(ASTNode **stmts, int count);
+ASTNode *create_list_node(ASTNode **elements, int count);
 ASTNode *create_print_node(ASTNode *value, const char *type);
 ASTNode *create_unary_node(const char *op, ASTNode *operand);
 ASTNode *create_binary_node(const char *op, ASTNode *left, ASTNode *right);

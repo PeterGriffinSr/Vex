@@ -94,6 +94,17 @@ ASTNode *create_print_node(ASTNode *value, const char *type) {
     return node;
 }
 
+ASTNode *create_list_node(ASTNode **elements, int count) {
+    ASTNode *node = alloc_node(NodeList);
+    node->list.elements = elements;
+    node->list.count = count;
+    return node;
+}
+
+ASTNode *build_list(ASTNode **items, int count) {
+    return create_list_node(items, count);
+}
+
 void indent_print(int indent, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
@@ -156,6 +167,12 @@ void printAST(ASTNode *node, int indent) {
             printf("Print:\n");
             indent_print(indent + 1, "Type: %s\n", node->print.type);
             printAST(node->print.value, indent + 2);
+            break;
+        case NodeList:
+            printf("List:\n");
+            for (int i = 0; i < node->list.count; i++) {
+                printAST(node->list.elements[i], indent + 1);
+            }
             break;
         default:
             return;

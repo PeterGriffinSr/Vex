@@ -48,13 +48,13 @@ void yyerror(const char *s) {
 
 %token LParen RParen LBracket RBracket LBrace RBrace Plus Minus Star Slash Assignment Comma Dot Underscore Pipe Less Greater Colon Semi
 %token Equal NotEqual LessEqual GreaterEqual ThiccArrow SkinnyArrow Spread PlusFloat MinusFloat StarFloat SlashFloat LogicalAnd LogicalOr 
-%token Val Type Match With If Else None Some Ok Error Then Not Fn
+%token Val Type Match With If Else None Some Ok Error Then Not Fn List
 %token Int Float Char String Bool
 %token Print Map Filter
 
 %type <node> statement expr var_decl primary_expr
-%type <node_list> statement_list
-%type <strval> type
+%type <node_list> statement_list expr_list
+%type <strval> type list_type
 
 %%
 
@@ -105,8 +105,17 @@ primary_expr:
   | Ident { $$ = create_identifier_node($1); }
   | BoolLit { $$ = create_bool_node($1); }
   | LParen expr RParen { $$ = $2; }
+  | LBracket expr_list RBracket { $$ = build_list($2.elements, $2.count); }
+
+expr_list:
+    expr { ASTNode **arr = arena_alloc(global_arena, sizeof(ASTNode *) * 1); arr[0] = $1; $$.elements = arr; $$.count = 1; }
+    | expr_list Comma expr { size_t new_count = (size_t)$1.count + 1; ASTNode **arr = arena_alloc(global_arena, sizeof(ASTNode *) * new_count); memcpy(arr, $1.elements, sizeof(ASTNode *) * (size_t)$1.count); arr[$1.count] = $3; $$.elements = arr; $$.count = (int)new_count; }
+
+list_type:
+    List Less type Greater { char *buf = arena_alloc(global_arena, 32); snprintf(buf, 32, "<%s>", $3); $$ = buf; }
 
 var_decl:
     Val type Colon Ident Assignment expr { $$ = create_var_decl_node($4, $2, $6); }
+    | Val list_type Colon Ident Assignment expr { $$ = create_var_decl_node($4, $2, $6); }
 
 %%
