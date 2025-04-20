@@ -24,7 +24,7 @@ jobs:
       run: |
         if [ $RUNNER_OS == 'Linux' ]; then
           sudo apt-get update
-          sudo apt-get install -y flex bison gcc meson
+          sudo apt-get install -y flex bison gcc meson clang-19 llvm-19 llvm-19-dev
         elif [ $RUNNER_OS == 'macOS' ]; then
           brew update
           brew install gcc flex bison meson
@@ -52,7 +52,7 @@ jobs:
       if: runner.os == 'Windows'
       shell: pwsh
       run: |
-        scoop install winflexbison meson gcc
+        scoop install winflexbison meson gcc llvm@19.1.4
 
     - name: Bootstrap the build system
       run: |

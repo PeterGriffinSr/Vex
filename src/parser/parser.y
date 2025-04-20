@@ -104,6 +104,7 @@ primary_expr:
   | StringLit { $$ = create_string_node($1); }
   | Ident { $$ = create_identifier_node($1); }
   | BoolLit { $$ = create_bool_node($1); }
+  | Print Less type Greater expr { $$ = create_print_node($5, $3); }
   | LParen expr RParen { $$ = $2; }
   | LBracket expr_list RBracket { $$ = build_list($2.elements, $2.count); }
 

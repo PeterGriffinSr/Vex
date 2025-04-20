@@ -83,7 +83,7 @@ StringLiteral   \"(\\.|[^\\"])*\"
 "filter"        { yycolumn += yyleng; return Filter; }
 
 {CharLiteral}   { yycolumn += yyleng; yylval.charval = yytext[1]; return CharLit; }
-{StringLiteral} { yycolumn += yyleng; char *copy = arena_alloc(global_arena, (size_t)yyleng + 1); memcpy(copy, yytext, (size_t)yyleng + 1); yylval.strval = copy; return StringLit; }
+{StringLiteral} { yycolumn += yyleng; int len = yyleng; char *stripped = arena_alloc(global_arena, (size_t)len - 1); memcpy(stripped, yytext + 1, (size_t)len - 2); stripped[len - 2] = '\0'; yylval.strval = stripped; return StringLit; }
 {IntLiteral}    { yycolumn += yyleng; yylval.intval = atoi(yytext); return IntLit; }
 {FloatLiteral}  { yycolumn += yyleng; yylval.floatval = strtof(yytext, NULL); return FloatLit; }
 {Identifier}    { yycolumn += yyleng; char *copy = arena_alloc(global_arena, (size_t)yyleng + 1); memcpy(copy, yytext, (size_t)yyleng + 1); yylval.strval = copy; return Ident; }

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
-#include "ast.h"
 #include "memory.h"
+#include "ast.h"
 
 extern Arena *global_arena;
 

@@ -1,13 +1,14 @@
-#include "memory.h"
 #ifdef _WIN32
 // Silence deprecation warnings on Windows
 #define _CRT_SECURE_NO_WARNINGS
 #endif // _WIN32
 
 #include <stdlib.h>
-#include "include/common.h"
-#include "include/tc.h"
+#include "common.h"
 #include "parser.h"
+#include "memory.h"
+#include "llvm.h"
+#include "tc.h"
 
 Arena *global_arena = NULL;
 extern FILE *yyin;
@@ -37,6 +38,7 @@ int main(int argc, char *argv[]) {
     }
 
     yyin = file;
+    root = NULL;
 
     if (yyparse() == 0) {
         printAST(root, 0);
@@ -46,9 +48,17 @@ int main(int argc, char *argv[]) {
     }
     typecheck(root);
 
+    init_llvm_codegen();
+    create_main_function();
+    write_llvm_ir_to_file("output.ll");
+    print_llvm_ir();
+
     fclose(file);
     arena_destroy(global_arena);
     yylex_destroy();
+    LLVMDisposeBuilder(Builder);
+    LLVMDisposeModule(TheModule);
+    LLVMContextDispose(TheContext);
 
     return EXIT_SUCCESS;
 }

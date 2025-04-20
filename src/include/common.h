@@ -15,6 +15,7 @@ void printVersion(void);
 void printOptimizersHelp(void);
 void printTargetHelp(void);
 void printWarningsHelp(void);
+void printCompilerHelp(void);
 void systemInfo(char *output, size_t size);
 bool handleCliOption(const char *arg);
 

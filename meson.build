@@ -1,4 +1,4 @@
-project('vex', 'c',
+project('vex', ['c', 'cpp'],
     version: '0.1.0',
     default_options: [
         'buildtype=debug',
@@ -42,19 +42,31 @@ lexer_c = custom_target('lexer.c',
   depend_files: ['src/parser/lexer.l']
 )
 
+llvm = dependency('llvm',
+  version: '>= 19.0.0',
+  method: 'config-tool',
+  native: true,
+  required: true,
+  modules: ['core', 'executionengine', 'orcjit', 'native']
+)
+
 srcs = [
+  lexer_c,
+  parser_c,
   'src/ast/ast.c',
-  'src/main.c',
+  'src/typechecker/tc.c',
+  'src/repl/repl.c',
+  'src/repl/eval.c',
+  'src/llvm/llvm.c',
   'src/core/memory.c',
   'src/core/error.c',
   'src/core/common.c',
-  'src/typechecker/tc.c',
-  parser_c,
-  lexer_c
+  'src/main.c',
 ]
 
 executable('vex',
   srcs,
   include_directories: include_directories('src/include'),
+  dependencies: [llvm],
   install: true
 )

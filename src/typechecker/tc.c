@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "tc.h"
+#include "ast.h"
 #include "memory.h"
+#include "tc.h"
 
 extern Arena *global_arena;
 
@@ -203,6 +204,16 @@ TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
             return make_list_type(first_elem_type);
         }
 
+        case NodePrint: {
+            TypeTC *annot_type = parse_type_annotation(node->print.type);
+            TypeTC *value = typecheck_expr_with_env(node->print.value, env);
+
+            if (annot_type->kind != value->kind) {
+                fprintf(stderr, "Type error: print expected type <%s> but got <%s>\n", type_to_string(annot_type->kind), type_to_string(value->kind));
+                exit(1);
+            }
+            return make_type(TypeError);
+        }
         default:
             type_error("Unsupported expression type");
     }

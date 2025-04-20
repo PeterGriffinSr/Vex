@@ -5,7 +5,6 @@ Vex is a memory safe purely functional programing language, with simple syntax f
 - **Memory Safety**: Vex eliminates common memory-related issues, such as null pointer dereferences and buffer overflows, ensuring that your applications run securely.
 - **Purely Functional**: Emphasizing immutability and first-class functions, Vex encourages a functional programming paradigm that leads to more predictable and maintainable code.
 - **Strong Type System**: Vex's strong static type system helps catch errors at compile time, reducing runtime issues and enhancing code reliability.
-- **Concurrency Support**: Built-in support for concurrent programming enables developers to create efficient, multi-threaded applications with ease.
 
 > Note: Vex is currently an experimental language. Expect changes to syntax, features, and tooling as development progresses.
 

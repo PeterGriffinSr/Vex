@@ -15,6 +15,7 @@ Thumbs.db
 !.y
 !.l
 !*/
+*.ll
 
 # === Build system caches ===
 .cache/
