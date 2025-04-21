@@ -156,7 +156,8 @@ LLVMValueRef create_main_function(void) {
     if (result != NULL) {
         LLVMBuildRet(Builder, result);
     } else {
-        LLVMBuildRetVoid(Builder);
+        LLVMValueRef zero = LLVMConstInt(LLVMInt64TypeInContext(TheContext), 0, false);
+        LLVMBuildRet(Builder, zero);
     }
 
     return mainFunction;
@@ -165,8 +166,6 @@ LLVMValueRef create_main_function(void) {
 void write_llvm_ir_to_file(const char *filename) {
     if (LLVMPrintModuleToFile(TheModule, filename, NULL) != 0) {
         fprintf(stderr, "Error writing IR to file %s\n", filename);
-    } else {
-        printf("LLVM IR has been written to %s\n", filename);
     }
 }
 

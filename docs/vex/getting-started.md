@@ -23,7 +23,7 @@ meson compile -C build
 cd build
 meson install
 ```
-Note: Ensure you have `meson`, a C compiler (like `gcc` or `clang`), and `flex/bison` installed.
+Note: Ensure you have `meson`, a C compiler (like `gcc` or `clang`),`flex/bison` and `llvm` (>= 19.0.0) installed.
 
 ---
 
@@ -34,13 +34,9 @@ val () -> int: main fn () =>
     print<string> "Hello, world";
     0;
 ```
-To run it:
+To compile and run:
 ```
-vex run main.vex
-```
-Or to compile and run:
-```
-vex build main.vex -o hello
+vex main.vex -o hello
 ./hello
 ```
 

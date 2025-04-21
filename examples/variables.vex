@@ -1,2 +1,1 @@
-print<string> "Hello, world!";
-print<int> 5;
+print<int> 5 + 5;

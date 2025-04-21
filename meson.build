@@ -43,7 +43,6 @@ lexer_c = custom_target('lexer.c',
 )
 
 llvm = dependency('llvm',
-  version: '>= 19.0.0',
   method: 'config-tool',
   native: true,
   required: true,

@@ -117,4 +117,3 @@ bool handleCliOption(const char *arg) {
     }
     return false;
 }
-
