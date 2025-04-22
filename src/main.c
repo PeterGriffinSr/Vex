@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
     typecheck(root);
 
     init_llvm_codegen();
-    create_main_function();
+    compile_root();
     write_llvm_ir_to_file("output.ll");
     print_llvm_ir();
 

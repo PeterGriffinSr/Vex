@@ -86,7 +86,6 @@ ASTNode *create_block_node(ASTNode **stmts, int count) {
     return node;
 }
 
-
 ASTNode *create_print_node(ASTNode *value, const char *type) {
     ASTNode *node = alloc_node(NodePrint);
     node->print.value = value;
@@ -103,6 +102,40 @@ ASTNode *create_list_node(ASTNode **elements, int count) {
 
 ASTNode *build_list(ASTNode **items, int count) {
     return create_list_node(items, count);
+}
+
+ASTNode *create_function_node(const char *name, struct Param *params, int param_count, const char **param_types, const char *return_type, ASTNode *body) {
+    ASTNode *node = alloc_node(NodeFunction);
+    node->type = NodeFunction;
+    node->function.name = name;
+    node->function.param_count = param_count;
+    node->function.expr = body;
+    node->function.return_type = return_type;
+
+    if (params) {
+        const char **names = arena_alloc(global_arena, sizeof(char *) * (size_t)param_count);
+        param_types = arena_alloc(global_arena, sizeof(char *) * (size_t)param_count);
+        for (int i = 0; i < param_count; i++) {
+            names[i] = params[i].name;
+            param_types[i] = params[i].type;
+        }
+        node->function.param_names = names;
+        node->function.param_types = param_types;
+    } else {
+        node->function.param_names = NULL;
+        node->function.param_types = NULL;
+    }
+
+    return node;
+}
+
+ASTNode *create_call_node(ASTNode *callee, ASTNode **args, int arg_count) {
+    ASTNode *node = alloc_node(NodeCall);
+    node->type = NodeCall;
+    node->call.callee = callee;
+    node->call.args = args;
+    node->call.arg_count = arg_count;
+    return node;
 }
 
 void indent_print(int indent, const char *fmt, ...) {
@@ -172,6 +205,25 @@ void printAST(ASTNode *node, int indent) {
             printf("List:\n");
             for (int i = 0; i < node->list.count; i++) {
                 printAST(node->list.elements[i], indent + 1);
+            }
+            break;
+        case NodeFunction:
+            printf("Function: %s\n", node->function.name);
+            indent_print(indent + 1, "Return Type: %s\n", node->function.return_type ? node->function.return_type : "<inferred>");
+            indent_print(indent + 1, "Parameters:\n");
+            for (int i = 0; i < node->function.param_count; i++) {
+                indent_print(indent + 2, "%s: %s\n", node->function.param_names[i], node->function.param_types[i]);
+            }
+            indent_print(indent + 1, "Body:\n");
+            printAST(node->function.expr, indent + 2);
+            break;
+        case NodeCall:
+            printf("Call:\n");
+            printAST(node->call.callee, indent + 1);
+            for (int i = 0; i < node->call.arg_count; i++) {
+                indent_print(indent + 1, NULL);
+                printf("Arg %d:\n", i);
+                printAST(node->call.args[i], indent + 2);
             }
             break;
         default:

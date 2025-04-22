@@ -124,6 +124,14 @@ TypeTC *lookup_type(TypeEnv *env, const char *name) {
     return NULL;
 }
 
+TypeTC *make_function_type(TypeTC *return_type, TypeTC **param_types, int param_count) {
+    TypeTC *t = make_type(TypeFunction);
+    t->return_type = return_type;
+    t->param_types = param_types;
+    t->param_count = param_count;
+    return t;
+}
+
 TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
     switch (node->type) {
         case NodeIntLit: return make_type(TypeInt);
@@ -172,18 +180,20 @@ TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
 
             for (int i = 0; i < node->block.count; i++) {
                 ASTNode *stmt = node->block.statements[i];
-                last_type = typecheck_expr_with_env(stmt, block_env);
-
+                TypeTC *stmt_type = typecheck_expr_with_env(stmt, block_env);
+            
                 if (stmt->type == NodeVarDecl) {
-                    TypeTC *binding_type = last_type;
-
+                    TypeTC *binding_type = stmt_type;
+            
                     if (stmt->var_decl.type) {
                         binding_type = parse_type_annotation(stmt->var_decl.type);
                     }
-
+            
                     block_env = add_binding(block_env, stmt->var_decl.value, binding_type);
                 }
-            }
+            
+                last_type = stmt_type;
+            }                      
 
             return last_type;
         }
@@ -212,8 +222,60 @@ TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
                 fprintf(stderr, "Type error: print expected type <%s> but got <%s>\n", type_to_string(annot_type->kind), type_to_string(value->kind));
                 exit(1);
             }
-            return make_type(TypeError);
+            return value;
         }
+
+        case NodeFunction: {
+            TypeTC *return_type = parse_type_annotation(node->function.return_type);
+
+            TypeTC **param_types = arena_alloc(global_arena, sizeof(TypeTC*) * (size_t)node->function.param_count);
+            for (int i = 0; i < node->function.param_count; i++) {
+                param_types[i] = parse_type_annotation(node->function.param_types[i]);
+            }
+
+            TypeTC *function_type = make_function_type(return_type, param_types, node->function.param_count);
+            env = add_binding(env, node->function.name, function_type);
+
+            TypeEnv *function_env = env;
+            for (int i = 0; i < node->function.param_count; i++) {
+                function_env = add_binding(function_env, node->function.param_names[i], param_types[i]);
+            }
+            TypeTC *body_type = typecheck_expr_with_env(node->function.expr, function_env);
+
+            if (return_type->kind != body_type->kind) {
+                fprintf(stderr, "Function '%s' returns type <%s> but body evaluates to <%s>\n",
+                        node->function.name, type_to_string(return_type->kind), type_to_string(body_type->kind));
+                exit(1);
+            }
+
+            return return_type;
+        }
+
+        case NodeCall: {
+            TypeTC *callee_type = typecheck_expr_with_env(node->call.callee, env);
+            if (callee_type->kind != TypeFunction) {
+                type_error("Callee must be a function");
+            }
+
+            TypeTC **param_types = callee_type->param_types;
+            int param_count = callee_type->param_count;
+
+            if (node->call.arg_count != param_count) {
+                type_error("Argument count mismatch in function call");
+            }
+
+            for (int i = 0; i < node->call.arg_count; i++) {
+                TypeTC *arg_type = typecheck_expr_with_env(node->call.args[i], env);
+                if (arg_type->kind != param_types[i]->kind) {
+                    fprintf(stderr, "Type mismatch in argument %d: expected <%s> but got <%s>\n",
+                            i + 1, type_to_string(param_types[i]->kind), type_to_string(arg_type->kind));
+                    exit(1);
+                }
+            }
+
+            return callee_type->return_type;
+        }
+        
         default:
             type_error("Unsupported expression type");
     }
@@ -222,5 +284,40 @@ TypeTC *typecheck_expr_with_env(ASTNode *node, TypeEnv *env) {
 }
 
 TypeTC *typecheck(ASTNode *node) {
-    return typecheck_expr_with_env(node, NULL);
+    if (node->type != NodeBlock) {
+        return typecheck_expr_with_env(node, NULL);
+    }
+
+    TypeEnv *env = NULL;
+
+    for (int i = 0; i < node->block.count; i++) {
+        ASTNode *stmt = node->block.statements[i];
+
+        if (stmt->type == NodeFunction) {
+            TypeTC *return_type = parse_type_annotation(stmt->function.return_type);
+            TypeTC **param_types = arena_alloc(global_arena, sizeof(TypeTC*) * (size_t)stmt->function.param_count);
+            for (int j = 0; j < stmt->function.param_count; j++) {
+                param_types[j] = parse_type_annotation(stmt->function.param_types[j]);
+            }
+            TypeTC *func_type = make_function_type(return_type, param_types, stmt->function.param_count);
+            env = add_binding(env, stmt->function.name, func_type);
+        }
+
+        if (stmt->type == NodeVarDecl) {
+            TypeTC *value_type = NULL;
+            if (stmt->var_decl.type) {
+                value_type = parse_type_annotation(stmt->var_decl.type);
+            } else {
+                value_type = typecheck_expr_with_env(stmt->var_decl.expr, env);
+            }
+            env = add_binding(env, stmt->var_decl.value, value_type);
+        }
+    }
+
+    TypeTC *last_type = make_type(TypeError);
+    for (int i = 0; i < node->block.count; i++) {
+        last_type = typecheck_expr_with_env(node->block.statements[i], env);
+    }
+
+    return last_type;
 }

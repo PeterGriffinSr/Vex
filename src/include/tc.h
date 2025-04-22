@@ -10,6 +10,7 @@ typedef enum {
     TypeChar,
     TypeString,
     TypeList,
+    TypeFunction,
     TypeError
 } TypeKind;
 
@@ -17,6 +18,9 @@ typedef struct TypeTC TypeTC;
 
 struct TypeTC {
     TypeKind kind;
+    TypeTC **param_types;
+    int param_count;
+    TypeTC *return_type;
     TypeTC *element_type;
 };
 
@@ -45,5 +49,6 @@ TypeTC *typecheck_function(ASTNode *node, TypeEnv *parent_env);
 TypeEnv *add_binding(TypeEnv *env, const char *name, TypeTC *type);
 TypeTC *typecheck_binary(const char *op, TypeTC *left, TypeTC *right);
 void update_binding(TypeEnv *env, ASTNode *ident_node, TypeTC *new_type);
+TypeTC *make_function_type(TypeTC *return_type, TypeTC **param_types, int param_count);
 
 #endif // TC_H

@@ -1,1 +1,7 @@
-print<int> 5 + 5;
+val (int, int) -> int: add fn (a, b) =>
+    a + b;
+
+val () -> int: main fn () => {
+    print<int> add(5, 5);
+    0;
+};
